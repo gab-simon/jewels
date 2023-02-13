@@ -1,61 +1,53 @@
-#ifndef __HELPER__
-#define __HELPER__
-
+#ifndef UTILS_H
+#define UTILS_H
+// Allegro libraries
+#include <stdio.h>
 #include <stdlib.h>
+#include <allegro5/allegro5.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
+#include <allegro5/allegro_image.h>
+#include <allegro5/allegro_primitives.h>
 
-#define BALL_RADIUS 12
-#define SPEED_FACTOR 25
-#define MOUSE_SENSIBILITY 5
+#define STRING_SIZE 10
+// Screen ratio
+#define SCREEN_SIZE_HEIGH 750
+#define SCREEN_SIZE_WIDTH 1200
+// Board size
+#define BOARD_SIZE_X 8
+#define BOARD_SIZE_Y 16
+// Distance between jewels sprites
+#define DISTANCE 72
+// Offset of the board display position
+#define OFFSET_Y -500
+#define OFFSET_X 70
+// Position of score
+#define POINTS_X 750
+#define POINTS_Y 80
+// Positions of menu buttons
+#define START_X0 470
+#define START_X 728
+#define START_Y0 260
+#define START_Y 335
+#define HELP_X0 470
+#define HELP_X 728
+#define HELP_Y0 370
+#define HELP_Y 447
+#define EXIT_X0 470
+#define EXIT_X 728
+#define EXIT_Y0 480
+#define EXIT_Y 559
+// Positions of buttons on playing state
+#define MENU_X0 730
+#define MENU_X 870
+#define MENU_Y0 600
+#define MENU_Y 645
+#define RESET_SCORE_X0 890
+#define RESET_SCORE_X 1030
+#define RESET_SCORE_Y0 600
+#define RESET_SCORE_Y 645
+// Minimum movement to move a jewel
+#define MIN_MOVE 30
 
-#define ROW 8
-#define COL 7
-
-typedef enum
-{
-	MENU,
-	INFO,
-	SERVING,
-	WAITING,
-	AIMING,
-	SHOOTING,
-	GAMEOVER,
-	EXIT
-} motion_states;
-
-struct game
-{
-	motion_states STATES;
-	int score;
-	int highscore;
-	int balls;
-	int shot_balls;
-	float dx;
-	float dy;
-	float shooting_x;
-	float shooting_y;
-};
-typedef struct game game_t;
-
-typedef struct ball ball_t;
-struct ball
-{
-	float x;
-	float y;
-	float dx;
-	float dy;
-};
-
-float block_side(float display_width);
-float block_i_x(float j, float l);
-float block_i_y(float i, float l);
-float block_mid_x(float j, float l);
-float block_mid_y(float i, float l);
-float block_f_x(float j, float l);
-float block_f_y(float i, float l);
-ball_t *buildBall(float x, float y);
-void build_game(game_t *game, float display_width);
-void build_blocks(int blocks[][COL]);
-void build_balls(ball_t ***balls, float display_width, float shooting_y);
-void destroy_balls(ball_t **balls, game_t *game);
 
 #endif
