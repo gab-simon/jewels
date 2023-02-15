@@ -8,11 +8,14 @@
 #include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
+#include "allegro5/allegro_native_dialog.h"
 
 #define STRING_SIZE 10
 // Screen ratio
-#define SCREEN_SIZE_HEIGH 750
-#define SCREEN_SIZE_WIDTH 1200
+#define HEIGHT 700
+#define WIDTH 1000
 // Board size
 #define BOARD_SIZE_X 8
 #define BOARD_SIZE_Y 16
