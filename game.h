@@ -2,7 +2,6 @@
 #define GAME_H
 #include "utils.h"
 
-
 typedef struct
 {
 	ALLEGRO_FONT *big;
@@ -38,7 +37,7 @@ typedef struct allegroEssencials {
     ALLEGRO_BITMAP *jewels[6];
     ALLEGRO_BITMAP *background;
     FILE *score;
-} allegroEssencials_t;
+} essencials_t;
 
 typedef struct mission {
     int candyType;
@@ -65,11 +64,13 @@ typedef struct board {
     game_states STATES;
     int points;
     int bestScore;
-    char strBestScore[STRING_SIZE];
-    char strPoints[STRING_SIZE];
+    int level;
+    char strBestScore[STRING_BUFFER];
+    char strPoints[STRING_BUFFER];
+    char strLevel[STRING_BUFFER];
     int emptySlotsColumns[8];
     slot_t *slots[8][16];
-    allegroEssencials_t *essencials;
+    essencials_t *essencials;
     mission_t *mission;
 } board_t;
 

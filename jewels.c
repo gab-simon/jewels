@@ -36,7 +36,6 @@ int main()
 
     ALLEGRO_FONT *font = al_load_ttf_font("resources/fonts/Minecraft.ttf", 18, 0);
     must_init(font, "font");
-
     char font_path[100];
     sprintf(font_path, "%s/resources/fonts/Minecraft.ttf", al_get_current_directory());
     printf("font_path: %s\n", font_path);
@@ -47,15 +46,15 @@ int main()
     fonts->small = al_load_font(font_path, 20, 0);
 
     must_init(al_init_image_addon(), "image addon");
-    ALLEGRO_BITMAP *red = al_load_bitmap("resources/imgs/red_jewel.jpg");
+    ALLEGRO_BITMAP *red = al_load_bitmap("resources/imgs/red_flower.png");
     must_init(red, "red");
-    ALLEGRO_BITMAP *green = al_load_bitmap("resources/imgs/green_jewel.png");
+    ALLEGRO_BITMAP *green = al_load_bitmap("resources/imgs/green_flower.png");
     must_init(green, "green");
-    ALLEGRO_BITMAP *blue = al_load_bitmap("resources/imgs/blue_jewel.png");
+    ALLEGRO_BITMAP *blue = al_load_bitmap("resources/imgs/blue_flower.png");
     must_init(blue, "blue");
-    ALLEGRO_BITMAP *orange = al_load_bitmap("resources/imgs/orange_jewel.png");
-    must_init(orange, "orange");
-    ALLEGRO_BITMAP *yellow = al_load_bitmap("resources/imgs/yellow_jewel.png");
+    ALLEGRO_BITMAP *purple = al_load_bitmap("resources/imgs/purple_flower.png");
+    must_init(purple, "purple");
+    ALLEGRO_BITMAP *yellow = al_load_bitmap("resources/imgs/yellow_flower.png");
     must_init(yellow, "yellow");
     ALLEGRO_BITMAP *bg_menu = al_load_bitmap("resources/imgs/bg_menu.png");
     must_init(bg_menu, "background");
@@ -70,18 +69,18 @@ int main()
     ALLEGRO_SAMPLE_ID sfx_menu;
     al_reserve_samples(1);
 
-    FILE *score = fopen("./score", "a+");
-    char scoreString[STRING_SIZE];
+    FILE *score = fopen("./resources/score", "a+");
+    char scoreString[STRING_BUFFER];
 
-    ALLEGRO_BITMAP *jewelsImages[6] = {NULL, blue, red, yellow, green, orange};
-    allegroEssencials_t *allegroEssencials = createEssencials(fonts->big, fonts->medium, fonts->small, jewelsImages, bg_menu, score);
+    ALLEGRO_BITMAP *jewelsImages[6] = {NULL, blue, red, yellow, green, purple};
+    essencials_t *allegroEssencials = createEssencials(fonts->big, fonts->medium, fonts->small, jewelsImages, bg_menu, score);
 
     ALLEGRO_EVENT event;
     ALLEGRO_KEYBOARD_STATE keyboard;
 
     board_t *board = createBoard();
 
-    bool done = false;
+    bool mute = false;
     bool redraw = true;
 
     board->essencials = allegroEssencials;
@@ -102,7 +101,7 @@ int main()
 
     resetBoard(board);
 
-    fgets(scoreString, STRING_SIZE, score);
+    fgets(scoreString, STRING_BUFFER, score);
     board->bestScore = atoi(scoreString);
 
     slot_t *slotAux;
@@ -116,17 +115,11 @@ int main()
         switch (event.type)
         {
         case ALLEGRO_EVENT_TIMER:
-            if (al_key_down(&keyboard, ALLEGRO_KEY_ESCAPE))
-                board->STATES = EXIT;
-            if (al_key_down(&keyboard, ALLEGRO_KEY_M))
-                board->STATES = MENU;
-            else if ((al_key_down(&keyboard, ALLEGRO_KEY_H) || al_key_down(&keyboard, ALLEGRO_KEY_F1)) && board->STATES != INFO)
-                board->STATES = INFO;
             al_get_keyboard_state(&keyboard);
 
+            // Serving a game
             if (board->STATES == SERVING)
             {
-                // Change candies positions logic
                 if (pressed && xMouseInit < 640 && xMouseInit > 70 && yMouseInit < 650 && yMouseInit > 80)
                 {
                     slotAux = board->slots[(xMouseInit - OFFSET_X) / DISTANCE][(yMouseInit - OFFSET_Y) / DISTANCE];
@@ -165,13 +158,12 @@ int main()
                 else if (xMouse > 800 && xMouse < 880 && yMouse > 600 && yMouse < 645 && pressed)
                     resetBoard(board);
             }
+
+            // Menu
             else if (board->STATES == MENU)
             {
-                    if (al_key_down(&keyboard, ALLEGRO_KEY_I))
-                        al_show_native_message_box(disp, "JEWELS", "Instruções", "Como jogar: utilize o mouse para direcionar a bola nos quadrados\nObjetivo: Conseguir a maior quantidade de pontos\nObs: Acerte os circulos brancos para obter mais bolas\n\nGabriel Simon GRR20210575\n\nExperimente apertar a tecla O :D", NULL, 0);
-
-                    if (al_key_down(&keyboard, ALLEGRO_KEY_ESCAPE))
-                        board->STATES = EXIT;
+                if (al_key_down(&keyboard, ALLEGRO_KEY_ESCAPE))
+                    board->STATES = EXIT;
                 if (xMouse > WIDTH * 0.5 - 160 && xMouse < WIDTH * 0.5 + 160 && yMouse > HEIGHT * 0.4 && yMouse < HEIGHT * 0.4 + 90 && pressed)
                 {
                     board->STATES = SERVING;
@@ -179,13 +171,12 @@ int main()
                 else if (xMouse > WIDTH * 0.5 - 160 && xMouse < WIDTH * 0.5 + 160 && yMouse > HEIGHT * 0.6 && yMouse < HEIGHT * 0.6 + 90 && pressed)
                     board->STATES = INFO;
             }
+
+            // Info
             else if (board->STATES == INFO)
             {
-                    if (al_key_down(&keyboard, ALLEGRO_KEY_I))
-                        al_show_native_message_box(disp, "JEWELS", "Instruções", "Como jogar: utilize o mouse para direcionar a bola nos quadrados\nObjetivo: Conseguir a maior quantidade de pontos\nObs: Acerte os circulos brancos para obter mais bolas\n\nGabriel Simon GRR20210575\n\nExperimente apertar a tecla O :D", NULL, 0);
-
-                    if (al_key_down(&keyboard, ALLEGRO_KEY_ESCAPE))
-                        board->STATES = EXIT;
+                if (al_key_down(&keyboard, ALLEGRO_KEY_ESCAPE))
+                    board->STATES = EXIT;
                 if (xMouse > WIDTH * 0.5 - 160 && xMouse < WIDTH * 0.5 + 160 && yMouse > HEIGHT * 0.4 && yMouse < HEIGHT * 0.4 + 90 && pressed)
                 {
                     board->STATES = MENU;
@@ -195,9 +186,29 @@ int main()
             redraw = true;
             break;
 
-        // ======== INPUT ========
+        // Keyboard events and Mouses (press and release)
         case ALLEGRO_EVENT_KEY_DOWN:
             al_get_keyboard_state(&keyboard);
+            if (al_key_down(&keyboard, ALLEGRO_KEY_I))
+                al_show_native_message_box(disp, "JEWELS", "Instruções", "Como jogar: utilize o mouse para direcionar a bola nos quadrados\nObjetivo: Conseguir a maior quantidade de pontos\nObs: Acerte os circulos brancos para obter mais bolas\n\nGabriel Simon GRR20210575\n\nExperimente apertar a tecla O :D", NULL, 0);
+            if (al_key_down(&keyboard, ALLEGRO_KEY_O))
+                board->level += 3;
+            if (al_key_down(&keyboard, ALLEGRO_KEY_ESCAPE))
+                board->STATES = EXIT;
+            if (al_key_down(&keyboard, ALLEGRO_KEY_M))
+                board->STATES = MENU;
+            if (al_key_down(&keyboard, ALLEGRO_KEY_R))
+                resetBoard(board);
+            if (al_key_down(&keyboard, ALLEGRO_KEY_9))
+            {
+                mute = !mute;
+                if (mute)
+                    al_stop_sample(&sfx_menu);
+                else
+                    al_play_sample(music_menu, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, &sfx_menu);
+            }
+            else if ((al_key_down(&keyboard, ALLEGRO_KEY_H) || al_key_down(&keyboard, ALLEGRO_KEY_F1)))
+                board->STATES = INFO;
             break;
         case ALLEGRO_EVENT_MOUSE_AXES:
             xMouse = event.mouse.x;
@@ -222,26 +233,22 @@ int main()
                 direction = D_DOWN;
             else if (direction < 0 && dy < 0 && abs(dy) > MIN_MOVE)
                 direction = D_UP;
-            // else if(state == S_PLAYING)
-            //     pressed = 0;
             break;
         case ALLEGRO_EVENT_DISPLAY_CLOSE:
-            done = true;
+            board->STATES = EXIT;
             break;
         }
 
-        if (done)
-            break;
-
-        // Draw Game when no movement is make
+        // Game rendering here (if needed)
         if (redraw && al_is_event_queue_empty(queue))
         {
             al_clear_to_color(al_map_rgb(0, 0, 0));
             if (board->STATES == SERVING)
             {
-                drawBackground(board, xMouse, yMouse);
-                drawPoints(board);
-                drawBoard(board);
+                buildBackground(board, xMouse, yMouse);
+                buildHUD(board);
+                buildBoard(board);
+                muteSound(mute);
             }
             else if (board->STATES == MENU)
             {
@@ -252,16 +259,16 @@ int main()
             {
                 buildInfo(allegroEssencials, board);
             }
-            al_draw_filled_circle(xMouse, yMouse, 5, al_map_rgb(255, 255, 255));
+            al_draw_filled_circle(xMouse, yMouse, 6, al_map_rgb(255, 123, 0));
             al_flip_display();
             redraw = false;
         }
     }
 
-    // -------- Destroy functions --------
+    // Clean up
     al_destroy_sample(music_menu);
     al_destroy_bitmap(red);
-    al_destroy_bitmap(orange);
+    al_destroy_bitmap(purple);
     al_destroy_bitmap(yellow);
     al_destroy_bitmap(green);
     al_destroy_bitmap(blue);

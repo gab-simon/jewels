@@ -5,9 +5,9 @@
 #include "draw.h"
 #include "utils.h"
 
-allegroEssencials_t *createEssencials(ALLEGRO_FONT *fontsBig, ALLEGRO_FONT *fontsMedium, ALLEGRO_FONT *fontsSmall, ALLEGRO_BITMAP *jewels[6], ALLEGRO_BITMAP *background, FILE *score)
+essencials_t *createEssencials(ALLEGRO_FONT *fontsBig, ALLEGRO_FONT *fontsMedium, ALLEGRO_FONT *fontsSmall, ALLEGRO_BITMAP *jewels[6], ALLEGRO_BITMAP *background, FILE *score)
 {
-    allegroEssencials_t *newEssencials = malloc(sizeof(allegroEssencials_t));
+    essencials_t *newEssencials = malloc(sizeof(essencials_t));
     if (!newEssencials)
         return NULL;
 
@@ -31,7 +31,6 @@ allegroEssencials_t *createEssencials(ALLEGRO_FONT *fontsBig, ALLEGRO_FONT *font
 // Verify if a slot exists in a slots array
 int verifyExcludedSlots(slot_t *excludedSlots[BOARD_SIZE_X], slot_t *slot)
 {
-
     for (int i = 0; i < BOARD_SIZE_X; i++)
     {
         if (slot == excludedSlots[i])
@@ -41,21 +40,33 @@ int verifyExcludedSlots(slot_t *excludedSlots[BOARD_SIZE_X], slot_t *slot)
 }
 
 // Draw game points
-void drawPoints(board_t *board)
+void buildHUD(board_t *board)
 {
-
     sprintf(board->strPoints, "%d", board->points);
     sprintf(board->strBestScore, "%d", board->bestScore);
-    al_draw_text(board->essencials->fonts->small, al_map_rgb(255, 255, 255), POINTS_X, POINTS_Y, 0, "SCORE ");
-    al_draw_text(board->essencials->fonts->small, al_map_rgb(255, 255, 255), POINTS_X + 150, POINTS_Y, 0, board->strPoints);
-    al_draw_text(board->essencials->fonts->small, al_map_rgb(255, 255, 255), POINTS_X, POINTS_Y + 40, 0, "BEST ");
-    al_draw_text(board->essencials->fonts->small, al_map_rgb(255, 255, 255), POINTS_X + 150, POINTS_Y + 40, 0, board->strBestScore);
+    sprintf(board->strLevel, "%d", board->level);
+    al_draw_text(board->essencials->fonts->small, al_map_rgb(255, 255, 255), 700, 80, 0, "Score: ");
+    al_draw_text(board->essencials->fonts->small, al_map_rgb(255, 255, 255), 700 + 150, 80, 0, board->strPoints);
+    al_draw_text(board->essencials->fonts->small, al_map_rgb(255, 255, 255), 700, 80 + 40, 0, "Best: ");
+    al_draw_text(board->essencials->fonts->small, al_map_rgb(255, 255, 255), 700 + 150, 80 + 40, 0, board->strBestScore);
+    al_draw_text(board->essencials->fonts->small, al_map_rgb(255, 255, 255), 700, 80 + 80, 0, "Level: ");
+    al_draw_text(board->essencials->fonts->small, al_map_rgb(255, 255, 255), 700 + 150, 80 + 80, 0, board->strLevel);
 }
 
-// Draw board
-void drawBoard(board_t *board)
+void muteSound(bool mute_bool)
 {
+    ALLEGRO_BITMAP *speaker = al_load_bitmap("resources/imgs/speaker.png");
+    ALLEGRO_BITMAP *mute = al_load_bitmap("resources/imgs/mute.png");
 
+    if (mute_bool)
+        al_draw_bitmap(mute, 0, 0, 0);
+    else
+        al_draw_bitmap(speaker, 0, 0, 0);
+}
+
+// build the board with the candies
+void buildBoard(board_t *board)
+{
     slot_t *slot = NULL;
 
     for (int j = BOARD_SIZE_Y - 8; j < BOARD_SIZE_Y; j++)
@@ -92,9 +103,9 @@ void drawBoard(board_t *board)
     }
 }
 
-void drawBackground(board_t *board, int xMouse, int yMouse)
+void buildBackground(board_t *board, int xMouse, int yMouse)
 {
-    char candiesDestroyed[STRING_SIZE];
+    char candiesDestroyed[STRING_BUFFER];
     al_draw_bitmap(board->essencials->background, 0, 0, 0);
 
     al_draw_filled_rectangle(695, 600, 760, 620, al_map_rgb(246, 242, 132));
@@ -104,13 +115,13 @@ void drawBackground(board_t *board, int xMouse, int yMouse)
     al_draw_text(board->essencials->fonts->small, al_map_rgb(0, 0, 0), 800, 600, 0, "ZERAR");
 
     sprintf(candiesDestroyed, "%d", board->mission->candiesDestroyed);
-    strcat(candiesDestroyed, "/10");
-    al_draw_text(board->essencials->fonts->small, al_map_rgb(255, 255, 255), 900, 400, 0, candiesDestroyed);
+    strcat(candiesDestroyed, "/15");
+    al_draw_text(board->essencials->fonts->small, al_map_rgb(255, 255, 255), 770, 400, 0, candiesDestroyed);
 
-    al_draw_scaled_bitmap(board->essencials->jewels[board->mission->candyType], 0, 0, 64, 64, 840, 388, 50, 50, 0);
+    al_draw_scaled_bitmap(board->essencials->jewels[board->mission->candyType], 0, 0, 64, 64, 700, 388, 50, 50, 0);
 }
 
-void drawMenu(allegroEssencials_t *essencials, int xMouse, int yMouse)
+void drawMenu(essencials_t *essencials, int xMouse, int yMouse)
 {
     ALLEGRO_BITMAP *button = al_load_bitmap("resources/imgs/button.png");
     al_draw_bitmap(essencials->background, 0, 0, 0);
@@ -126,7 +137,7 @@ void drawMenu(allegroEssencials_t *essencials, int xMouse, int yMouse)
     al_flip_display();
 }
 
-void buildInfo(allegroEssencials_t *essencials, board_t *board)
+void buildInfo(essencials_t *essencials, board_t *board)
 {
     ALLEGRO_BITMAP *button = al_load_bitmap("resources/imgs/button.png");
     al_draw_bitmap(essencials->background, 0, 0, 0);
@@ -164,11 +175,11 @@ void transitingJewels(board_t *board, slot_t *slot, int direction)
                 while (slot->xDisplayPos - count > slot->left->xDisplayPos)
                 {
                     al_clear_to_color(al_map_rgb(0, 0, 0));
-                    drawBackground(board, 0, 0);
+                    buildBackground(board, 0, 0);
                     al_draw_bitmap(board->essencials->jewels[slot->candy->type], slot->xDisplayPos - count, slot->yDisplayPos, 0);
                     al_draw_bitmap(board->essencials->jewels[slot->left->candy->type], slot->left->xDisplayPos + count, slot->left->yDisplayPos, 0);
-                    drawBoard(board);
-                    drawPoints(board);
+                    buildBoard(board);
+                    buildHUD(board);
                     al_flip_display();
                     count += 5;
                 }
@@ -180,11 +191,11 @@ void transitingJewels(board_t *board, slot_t *slot, int direction)
                 while (slot->xDisplayPos + count < slot->right->xDisplayPos)
                 {
                     al_clear_to_color(al_map_rgb(0, 0, 0));
-                    drawBackground(board, 0, 0);
+                    buildBackground(board, 0, 0);
                     al_draw_bitmap(board->essencials->jewels[slot->candy->type], slot->xDisplayPos + count, slot->yDisplayPos, 0);
                     al_draw_bitmap(board->essencials->jewels[slot->right->candy->type], slot->right->xDisplayPos - count, slot->right->yDisplayPos, 0);
-                    drawBoard(board);
-                    drawPoints(board);
+                    buildBoard(board);
+                    buildHUD(board);
                     al_flip_display();
                     count += 5;
                 }
@@ -196,11 +207,11 @@ void transitingJewels(board_t *board, slot_t *slot, int direction)
                 while (slot->yDisplayPos - count > slot->up->yDisplayPos)
                 {
                     al_clear_to_color(al_map_rgb(0, 0, 0));
-                    drawBackground(board, 0, 0);
+                    buildBackground(board, 0, 0);
                     al_draw_bitmap(board->essencials->jewels[slot->candy->type], slot->xDisplayPos, slot->yDisplayPos - count, 0);
                     al_draw_bitmap(board->essencials->jewels[slot->up->candy->type], slot->up->xDisplayPos, slot->up->yDisplayPos + count, 0);
-                    drawBoard(board);
-                    drawPoints(board);
+                    buildBoard(board);
+                    buildHUD(board);
                     al_flip_display();
                     count += 5;
                 }
@@ -212,11 +223,11 @@ void transitingJewels(board_t *board, slot_t *slot, int direction)
                 while (slot->yDisplayPos + count < slot->down->yDisplayPos)
                 {
                     al_clear_to_color(al_map_rgb(0, 0, 0));
-                    drawBackground(board, 0, 0);
+                    buildBackground(board, 0, 0);
                     al_draw_bitmap(board->essencials->jewels[slot->candy->type], slot->xDisplayPos, slot->yDisplayPos + count, 0);
                     al_draw_bitmap(board->essencials->jewels[slot->down->candy->type], slot->down->xDisplayPos, slot->down->yDisplayPos - count, 0);
-                    drawBoard(board);
-                    drawPoints(board);
+                    buildBoard(board);
+                    buildHUD(board);
                     al_flip_display();
                     count += 5;
                 }
@@ -224,8 +235,8 @@ void transitingJewels(board_t *board, slot_t *slot, int direction)
             else
                 continue;
 
-            drawBoard(board);
-            drawPoints(board);
+            buildBoard(board);
+            buildHUD(board);
             al_flip_display();
         }
     }
@@ -299,12 +310,12 @@ void fallJewels(board_t *board)
         if (done)
             break;
         count += 6;
-        drawBoard(board);
+        buildBoard(board);
         resetDrawned(board);
-        drawPoints(board);
+        buildHUD(board);
         al_flip_display();
         al_clear_to_color(al_map_rgb(0, 0, 0));
-        drawBackground(board, 0, 0);
+        buildBackground(board, 0, 0);
     }
     resetDrawned(board);
 }
