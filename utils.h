@@ -14,26 +14,21 @@
 
 #define STRING_BUFFER 16
 
-// Screen ratio
+// size of the window
 #define HEIGHT 700
 #define WIDTH 950
 
-// Board size
+// size of the board
 #define BOARD_SIZE_X 8
 #define BOARD_SIZE_Y 16
 
-// Distance between jewels sprites
+// distance between flowers
 #define DISTANCE 72
 
-// Offset of the board display position
 #define OFFSET_Y -500
 #define OFFSET_X 70
 
-// Position of score
-#define POINTS_X 750
-#define POINTS_Y 80
-
 // Minimum movement to move a jewel
-#define MIN_MOVE 30
+#define MOV 30
 
 #endif

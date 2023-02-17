@@ -73,7 +73,7 @@ int main()
     char scoreString[STRING_BUFFER];
 
     ALLEGRO_BITMAP *jewelsImages[6] = {NULL, blue, red, yellow, green, purple};
-    essencials_t *allegroEssencials = createEssencials(fonts->big, fonts->medium, fonts->small, jewelsImages, bg_menu, score);
+    essencials_t *allegroEssencials = initEssencials(fonts->big, fonts->medium, fonts->small, jewelsImages, bg_menu, score);
 
     ALLEGRO_EVENT event;
     ALLEGRO_KEYBOARD_STATE keyboard;
@@ -94,17 +94,17 @@ int main()
     for (int j = 0; j < BOARD_SIZE_Y; j++)
         for (int i = 0; i < BOARD_SIZE_X; i++)
         {
-            board->slots[i][j]->candy->type = 1 + (rand() % 5);
+            board->slots[i][j]->flower->type = 1 + (rand() % 5);
             board->slots[i][j]->xDisplayPos = i * DISTANCE + OFFSET_X;
-            board->slots[i][j]->yDisplayPos = (j)*DISTANCE + OFFSET_Y;
+            board->slots[i][j]->yDisplayPos = (j) * DISTANCE + OFFSET_Y;
         }
 
-    resetBoard(board);
+    restartGame(board);
 
     fgets(scoreString, STRING_BUFFER, score);
     board->bestScore = atoi(scoreString);
 
-    slot_t *slotAux;
+    slot_t *slotSupport;
     al_start_timer(timer);
     al_hide_mouse_cursor(disp);
     al_grab_mouse(disp);
@@ -122,26 +122,25 @@ int main()
             {
                 if (pressed && xMouseInit < 640 && xMouseInit > 70 && yMouseInit < 650 && yMouseInit > 80)
                 {
-                    slotAux = board->slots[(xMouseInit - OFFSET_X) / DISTANCE][(yMouseInit - OFFSET_Y) / DISTANCE];
-                    // Test if it's a valid transition
-                    if (!validTransition(slotAux, direction))
+                    slotSupport = board->slots[(xMouseInit - OFFSET_X) / DISTANCE][(yMouseInit - OFFSET_Y) / DISTANCE];
+                    if (!checkSwap(slotSupport, direction))
                     {
                         pressed = 0;
                         continue;
                     }
-                    transitingJewels(board, slotAux, direction);
-                    changePositions(slotAux, direction);
-                    if (!verifyMatch(board, 0))
+                    animationFlowers(board, slotSupport, direction);
+                    swapPositions(slotSupport, direction);
+                    if (!checkMatch(board, 0))
                     {
-                        transitingJewels(board, slotAux, direction);
-                        resetDrawned(board);
-                        changePositions(slotAux, direction);
+                        animationFlowers(board, slotSupport, direction);
+                        restartDraw(board);
+                        swapPositions(slotSupport, direction);
                     }
                     else
                     {
-                        fillEmptySlots(board, 1);
-                        while (verifyMatch(board, 0))
-                            fillEmptySlots(board, 1);
+                        putSpacesVague(board, 20);
+                        while (checkMatch(board, 0))
+                            putSpacesVague(board, 20);
                     }
                     if (board->points > board->bestScore)
                     {
@@ -153,10 +152,10 @@ int main()
                 else if (xMouse > 700 && xMouse < 780 && yMouse > 600 && yMouse < 645 && pressed)
                 {
                     board->STATES = MENU;
-                    resetBoard(board);
+                    restartGame(board);
                 }
                 else if (xMouse > 800 && xMouse < 880 && yMouse > 600 && yMouse < 645 && pressed)
-                    resetBoard(board);
+                    restartGame(board);
             }
 
             // Menu
@@ -198,7 +197,7 @@ int main()
             if (al_key_down(&keyboard, ALLEGRO_KEY_M))
                 board->STATES = MENU;
             if (al_key_down(&keyboard, ALLEGRO_KEY_R))
-                resetBoard(board);
+                restartGame(board);
             if (al_key_down(&keyboard, ALLEGRO_KEY_9))
             {
                 mute = !mute;
@@ -225,14 +224,14 @@ int main()
             dx = xMouseEnd - xMouseInit;
             dy = yMouseEnd - yMouseInit;
             direction = abs(dx) - abs(dy);
-            if (direction > 0 && dx < 0 && abs(dx) > MIN_MOVE)
-                direction = D_LEFT;
-            else if (direction > 0 && dx > 0 && abs(dx) > MIN_MOVE)
-                direction = D_RIGHT;
-            else if (direction < 0 && dy > 0 && abs(dy) > MIN_MOVE)
-                direction = D_DOWN;
-            else if (direction < 0 && dy < 0 && abs(dy) > MIN_MOVE)
-                direction = D_UP;
+            if (direction > 0 && dx < 0 && abs(dx) > MOV)
+                direction = DIR_LEFT;
+            else if (direction > 0 && dx > 0 && abs(dx) > MOV)
+                direction = DIR_RIGHT;
+            else if (direction < 0 && dy > 0 && abs(dy) > MOV)
+                direction = DIR_DOWN;
+            else if (direction < 0 && dy < 0 && abs(dy) > MOV)
+                direction = DIR_UP;
             break;
         case ALLEGRO_EVENT_DISPLAY_CLOSE:
             board->STATES = EXIT;

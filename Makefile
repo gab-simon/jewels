@@ -9,7 +9,7 @@ CC = gcc
 all: $(EXEC_NAME)
 
 all debug: $(EXEC_NAME)
-debug: CFLAGS += -g -D__DEBUG__
+debug: CFLAGS += -g -DIR__DEBUG__
 
 $(EXEC_NAME): $(OBJS)
 	$(CC) $(OBJS) $(CFLAGS) $(LIBS) -o $(EXEC_NAME)
